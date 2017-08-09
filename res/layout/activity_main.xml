@@ -1,0 +1,56 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="${relativePackage}.${activityClass}" >
+
+    <TextView
+        
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_world" />
+	<Button 
+	    android:id="@+id/startplay"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="startPlayURI"
+	    />
+	<Button 
+	    android:id="@+id/startplay_resources"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="startPlayResource"
+	    />
+	<Button 
+	    android:id="@+id/getRate"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="getRate()"
+	    />
+	<Button 
+	    android:id="@+id/pause"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="pause()"
+	    />
+	<Button 
+	    android:id="@+id/setBPM240"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="setBPM240"
+	    />
+	<ListView 
+	    android:id="@+id/bpm_lv"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    
+	    ></ListView>
+	<SeekBar
+	    android:id="@+id/seekBarRate"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:max="2000"
+	     />
+
+</LinearLayout>
