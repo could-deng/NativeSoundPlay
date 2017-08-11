@@ -14,9 +14,9 @@
 #
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
-LOCAL_MODULE := audio-tools
-LOCAL_SRC_FILES := com_fitmix_sdk_common_OSLESMediaPlayer.c
-
+LOCAL_MODULE := watch-data-transfer
+LOCAL_SRC_FILES := com_fitmix_sdk_common_WatchTransMethods.c MiniDICOM.c MiniDICOMFile.c WatchDateTime.c WatchFileIO.c WatchSportsLogData.c WatchSportsSensorData.c
+#com_fitmix_sdk_common_OSLESMediaPlayer.c 
 LOCAL_CFLAGS := -DHAVE_CONFIG_H -DFPM_ARM -ffast-math -O3
 LOCAL_LDLIBS += -lOpenSLES -llog
 # for native asset manager

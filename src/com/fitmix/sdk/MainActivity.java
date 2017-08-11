@@ -20,10 +20,12 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.nativesoundplay.R;
 import com.fitmix.sdk.common.OSLESMediaPlayer;
+import com.fitmix.sdk.common.WatchTransMethods;
 
 public class MainActivity extends Activity {
 
@@ -35,10 +37,27 @@ public class MainActivity extends Activity {
 	String path = Environment.getExternalStorageDirectory()+ File.separator+"fitmix"+File.separator+"Music"+File.separator+"185.mp3.down";
 
 	
+	/** Load jni .so on initialization */
+    static {
+         System.loadLibrary("watch-data-transfer");
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        
+        TextView tt_test = (TextView)(findViewById(R.id.tt_test));
+        tt_test.setText(WatchTransMethods.square(2)+"");
+        		
+        
+        
+        
+        
+        
+        
+        
 //        assetManager = getAssets();
 //        try {
 //			copyBigDataToSD(path);
@@ -166,10 +185,7 @@ public class MainActivity extends Activity {
 		});
 //        OSLESMediaPlayer.createEngine();
     }
-    /** Load jni .so on initialization */
-    static {
-         System.loadLibrary("audio-tools");
-    }
+    
 
     @Override
     protected void onPause() {

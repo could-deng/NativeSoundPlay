@@ -1,0 +1,493 @@
+#ifndef MINI_DICOM_H
+#define MINI_DICOM_H
+
+
+#include "WatchDefine.h"
+
+#if defined(__cplusplus)
+extern "C" {     /* Make sure we have C-declarations in C++ programs */
+#endif
+
+
+#define TAG_MIN_LENGTH 10
+#define IRON_HEAD_LEN 8
+#define CHAPTER_SUMMARY_LEN 26
+#define PREFIX_DATA_LENGTH 34
+#define TAG_GROUP_LENGTH 10
+#define MAX_VALID_CHAPTER_DATA_LENGTH 990
+
+typedef enum{
+	TAG_GROUP_RESERVED,					//保留
+	TAG_GROUP_CMD_BASE,
+	TAG_GROUP_REQUEST = TAG_GROUP_CMD_BASE,					//请求
+	TAG_GROUP_RESPONSE,					//应答
+	TAG_GROUP_CHAPTER,					//章节
+
+	TAG_GROUP_PHONE_PUSH_BASE = 100,
+	TAG_GROUP_NOTIFICATION = TAG_GROUP_PHONE_PUSH_BASE,				// 通知
+	TAG_GROUP_WEATHER,					//天气
+	TAG_GROUP_CALL,						//通话
+	TAG_GROUP_USERINFO,					//用户信息
+	TAG_GROUP_UPGRADE,					//升级
+	TAG_GROUP_BIND,						//绑定
+	TAG_GROUP_DIAL_PALTE,				//表盘设置
+	TAG_GROUP_TRAINING_PROGRAM,		//训练计划
+	TAG_GROUP_CHALLENGE,				//挑战
+	TAG_GROUP_HEALTH,			//健康建议
+
+	TAG_GROUP_WATCH_PUSH_BASE = 500,
+	TAG_GROUP_FIND  = TAG_GROUP_WATCH_PUSH_BASE,					//相互查找
+	TAG_GROUP_ADD_LOG,					//添加记录
+	TAG_GROUP_REMOVE_LOG,				//删除运动记录
+	TAG_GROUP_DOWNLOAD_LOGS,			//下载近期运动记录
+	TAG_GROUP_SPORTS_SUMMARY_DATA,	//汇总数据
+	TAG_GROUP_SPORTS_GROUP_DATA,		//按类型分组汇总数据
+	TAG_GROUP_SENSOR_DATA,				//SENSOR数据
+	TAG_GROUP_LOCALE_SETTINGS,			//本地设置
+	TAG_GROUP_ERROR_REPORT,			// 错误报告
+	TAG_GROUP_TIME,						//时间同步
+	TAG_GROUP_GPS,						//GPS同步
+	TAG_GROUP_MUSIC,		//音乐
+	TAG_GROUP_SYN_LOG_DONE,	//同步完成
+	TAG_GROUP_MAX
+	}enumTagGroup;
+
+typedef enum{
+	PACKAGE_RESULT_SUCCESS,
+	PACKAGE_RESULT_FAILURE,
+	PACKAGE_RESULT_DECODE_ERROR,
+	PACKAGE_RESULT_TIME_OUT,
+	PACKAGE_RESULT_MAX
+	}enumPackageResult;
+
+typedef enum{
+	VR_VOID,					//无类型
+	VR_S32,					//有符号32位
+	VR_U32,					//无符号32位
+	VR_S16,					//有符号16位
+	VR_U16,					//无符号16位
+	VR_DOUBLE,				//16字节双精度
+	VR_FLOAT,				//8字节浮点
+	VR_STRING_ANSI,			//ANSI字符串
+	VR_STRING_GB2312,		//GB2312字符串
+	VR_STRING_BIG5,			//BIG5字符串
+	VR_STRING_UTF8,			//UTF8字符串
+	VR_STRING_UTF16_BE,		//UTF16 Big Enddian字符串
+	VR_STRING_UTF16_LE,		//UTF16 Little Enddian字符串
+	VR_STRING_UTF32,			//UTF32 字符串
+	VR_MAX
+	}enumVRType;
+
+typedef enum{
+	REQUEST_RESERVED,
+	REQUEST_TAG,
+	REQUEST_POS,
+	REQUEST_TOTALLEN,
+	REQUEST_MAX
+	}enumRequestCell;
+
+typedef enum{
+	RESPONSE_RESERVED,
+	RESPONSE_RESULT,
+	RESPONSE_MAX
+	}enumReponseCell;
+
+
+typedef enum{
+	NOTIFICATION_BLE_RESERVED,
+	NOTIFICATION_BLE_SMS,		//短信
+	NOTIFICATION_BLE_QQ,			//QQ
+	NOTIFICATION_BLE_WEICHART,	//微信
+	NOTIFICATION_BLE_EMAIL,		//邮件
+	NOTIFICATION_BLE_NEWS,		//新闻
+	NOTIFICATION_BLE_WEIBO,		//微博
+	NOTIFICATION_BLE_FITMIX,		//Fitmix特意推送的消息
+	NOTIFICATION_BLE_MISSEDCALL,	//未接电话
+	NOTIFICATION_BLE_WANGWANG,		//旺旺
+	NOTIFICATION_BLE_DINGDING,		//丁丁
+	NOTIFICATION_BLE_ALIPAY,		//支付宝
+	NOTIFICATION_BLE_MAX		
+	}enumNotificationCell;
+
+typedef enum{
+	NOTIFICATION_FIELD_TITLE,		//标题栏
+	NOTIFICATION_FIELD_DATE,		//原始消息的日期
+	NOTIFICATION_FIELD_TIME,		//原始消息的时间
+	NOTIFICATION_FIELD_CONTENT,	//消息内容
+	NOTIFICATION_FIELD_MAX
+	}enumNotificationField;
+
+typedef enum{
+	WEATHER_BLE_RESERVED,
+	WEATHER_BLE_QUERY,				//手表端发送的查询请求
+	WEATHER_BLE_TYPE,				//天气类型,主要用于图标的显示。
+	WEATHER_BLE_CITY,				//城市
+	WEATHER_BLE_WEATHER_DATE,		//天气日期
+	WEATHER_BLE_WEATHER_TIME,		//天气时间
+	WEATHER_BLE_UPDATE_DATE,		//数据的更新日期
+	WEATHER_BLE_UPDATE_TIME,		//数据的更新时间
+	WEATHER_BLE_TITLE,				//天气标题
+	WEATHER_BLE_TEMPRATURE,		//气温
+	WEATHER_BLE_PRESSURE,			//气压
+	WEATHER_BLE_HUMITY,				//湿度
+	WEATHER_BLE_WIND,				//风
+	WEATHER_BLE_AIR_QUALITY,			//空气质量
+	WEATHER_BLE_PM25,				//PM2.5
+	WEATHER_BLE_SPORTS,				//运动指标
+	WEATHER_BLE_ULTRAVIOLET,		//紫外线强度
+	WEATHER_BLE_COLD,				//感冒字数
+	WEATHER_BLE_ALARM,				//天气预警
+	WEATHER_BLE_DETAIL,				//详细描述
+	WEATHER_BLE_MAX
+	}enumWeatherCell;
+
+typedef enum{
+	CALL_BLE_RESERVED,
+	CALL_BLE_TITLE,				//来电号码或姓名
+	CALL_BLE_INCOMING,			//来电
+	CALL_BLE_ANSWER,			//接听
+	CALL_BLE_DECLINE,			//挂断
+	CALL_BLE_MAX	
+	}enumCallCell;
+
+typedef enum{
+	USERINFO_BLE_RESERVED,
+	USERINFO_BLE_QUERY,			//查询用户信息
+	USERINFO_BLE_SEX,			//性别	0=男 1=女
+	USERINFO_BLE_BIRTHDAY,		//生日
+	USERINFO_BLE_HEIGHT,			//身高 cm
+	USERINFO_BLE_WEIGHT,		//体重 kg
+	USERINFO_BLE_MAX
+	}enumUserInfoCell;	
+
+typedef enum{
+	UPGRADE_BLE_RESERVED,
+	UPGRADE_BLE_QUERY,				//查询版本信息
+	UPGRADE_BLE_VERSIONS_NAME,		//版本名称
+	UPGRADE_BLE_VERSION_NO,		//版本号
+	UPGRADE_BLE_VERSION_SUMMARY,	//版本简介
+	UPGRADE_BLE_DATA,				//版本升级包数据
+	UPGRADE_BLE_MAX
+	}enumUpgradeCell;
+
+typedef enum{
+	FIND_BLE_RESERVED,
+	FIND_BLE_FINDPHONE,				//寻找手机
+	FIND_BLE_FINDWATCH,				//寻找手表
+	FIND_BLE_MAX
+	}enumFindCell;
+
+typedef enum{
+	BIND_BLE_RESERVED,
+	BIND_BLE_BIND,					//绑定手机
+	BIND_BLE_UNBIND,				//解绑手机
+	BIND_BLE_BIND_RESULT,			//绑定结果 
+	BIND_BLE_UNBIND_RESULT,			//解绑结果 
+	BIND_BLE_MAX
+	}enumBindCell;
+
+typedef enum{
+	SPORT_BLE_RESERVED,
+	SPORT_BLE_BASE=1,
+	SPORT_BLE_TYPE = SPORT_BLE_BASE,		//运动类型
+	SPORT_BLE_START_DATE,						//运动日期
+	SPORT_BLE_START_TIME,						//运动时间 
+	SPORT_BLE_DURATION,					//运动时长
+	SPORT_BLE_TOTAL_CALORIE,				//运动卡路里
+	SPORT_BLE_PAUSE_COUNT,			//运动暂停次数
+	SPORT_BLE_PAUSE_DETAIL,			//运动暂停详情(开始秒数,持续秒数)
+	SPORT_BLE_TOTAL_FAT_BURST,		//体脂消耗
+	SPORT_BLE_VO2MAX,				//最大摄氧量
+	SPORT_BLE_HR_STATISTICS,		//心率统计
+
+	SPORT_BLE_MOVE_BASE=30,					//移动类运动
+	SPORT_BLE_TOTAL_DISTANCE= SPORT_BLE_MOVE_BASE,		//运动距离
+	SPORT_BLE_AVERAGE_SPEED,						//运动速度
+	SPORT_BLE_AVERAGE_PACE,							//运动配速
+	SPORT_BLE_AVERAGE_STEP_FREQUENCY,				//运动步频
+	SPORT_BLE_TOTAL_STEPS,							//运动步数
+	SPORT_BLE_PACE_RECORDS,			//配速表(时间,里程)
+	SPORT_BLE_GROUP_RECORDS,		//分组记录(时间,里程)
+	SPORT_BLE_MAX_PACE,				//最高配速
+	SPORT_BLE_MAX_STEP_FREQUENCY,	//最高步频
+	
+	SPORT_BLE_UP_BASE=40,
+	SPORT_BLE_AVERAGE_VERTICAL_SPEED = SPORT_BLE_UP_BASE,			//垂直速度
+	SPORT_BLE_TOTAL_FOOTSTEPS,					//台阶数
+	SPORT_BLE_PEAK_ALTITUDE,						//海拔
+	SPORT_BLE_TOTAL_UP_DISTANCE,					//上升里程
+	SPORT_BLE_TOTAL_DOWN_DISTANCE,					//上升里程
+	SPORT_BLE_TROUGH_ALTITUDE,
+
+	SPORT_BLE_RIDE_BASE=50,
+	SPORT_BLE_RIDE_POWER=SPORT_BLE_RIDE_BASE,					//骑行功率
+	SPORT_BLE_MAX_CIRCLES_FREQUENCY,			//最大骑行踏频率
+	SPORT_BLE_FEET_CIRCLES,				//骑行脚的圈数
+	
+	SPORT_BLE_SWIM_BASE=60,
+	SPORT_BLE_SWIM_ARM=SPORT_BLE_SWIM_BASE,			//游泳挥臂次数
+	SPORT_BLE_SWIM_STYLE,			//游姿
+	SPORT_BLE_SWIM_ROUND_TRIPS,			//往返次数
+
+	SPORT_BLE_OTHER_BASE = 240,
+
+	SPORT_BLE_DETAIL=254,						//运动详细描述
+	SPORT_BLE_MAX
+	}enumSportCell;
+
+typedef enum{
+	REMOVE_LOG_RESERVED,
+	REMOVE_LOG_DATETIME,
+	REMOVE_LOG_MAX
+	}enumRemoveLog;
+
+typedef enum{
+	DOWNLOAD_LOG_RESERVED,
+	DOWNLOAD_LOG_LOGS,
+	DOWNLOAD_LOG_MAX
+	}enumDownloadLog;
+
+ typedef enum{
+	SUMMARY_RESERVED,
+	SUMMARY_QUERY,								//查询汇总数据
+	SUMMARY_TOTAL_SPORTS_LOGS,					//总运动记录数
+	SUMMARY_TOTAL_SPORTS_DISTANCE,					//总里程
+	SUMMARY_TOTAL_SPORTS_DURATION,					//总运动时长
+	SUMMARY_TOTAL_SPORTS_CALORIE,				//总卡路里 
+	SUMMARY_TOTAL_SPORTS_CORE_DATA_VALUES,	//核心数据汇总
+
+	SUMMARY_THIS_MONTH_SPORTS_LOGS,			//本月运动记录数
+	SUMMARY_THIS_MONTH_SPORTS_DISTANCE,		//本月运动里程
+	SUMMARY_THIS_MONTH_SPORTS_CALORIE,		//本月运动卡路里
+	SUMMARY_THIS_MONTH_SPORTS_DURATION,		//本月运动时长
+	SUMMARY_THIS_MONTH_SPORTS_CORE_DATA_VALUES,		//本月运动核心数据汇总
+	SUMMARY_THIS_WEEK_SPORTS_LOGS,			//本周运动记录数
+	SUMMARY_THIS_WEEK_SPORTS_DISTANCE,			//本周运动里程
+	SUMMARY_THIS_WEEK_SPORTS_CALORIE,			//本周卡路里
+	SUMMARY_THIS_WEEK_SPORTS_DURATION,			//本周运动时长
+	SUMMARY_THIS_WEEK_SPORTS_CORE_DATA_VALUES,			//本周核心数据汇总
+
+	SUMMARY_SPORT_SYN_DATE,					//汇总数据同步的日期 
+	SUMMARY_SPORT_SYN_TIME,					//汇总数据同步的时间
+	SUMMARY_MAX
+	}enumSummarySportsData;	
+
+
+typedef enum{
+	GROUP_RESERVED,
+	GROUP_QUERY,							//查询分组数据
+	GROUP_TYPE,								//数据分组类型
+	GROUP_THIS_WEEK_SPORTS_LOGS,			//本周运动记录数
+	GROUP_THIS_WEEK_SPORTS_DISTANCE,		//本周运动里程
+	GROUP_THIS_WEEK_SPORTS_CALORIE,		//本周运动卡路里
+	GROUP_THIS_WEEK_SPORTS_DURATION,		//本周运动时间
+	GROUP_THIS_WEEK_SPORTS_CORE_DATA_VALUES,		//本周核心数据汇总
+	GROUP_SPORT_SYN_DATE,					//数据同步的日期 
+	GROUP_SPORT_SYN_TIME,					//数据同步的时间 
+	GROUP_MAX
+	}enumGroupSportsData;	
+
+typedef enum{
+	SENSOR_FIELD_RESERVED,		
+	SENSOR_FIELD_DATE,				//日期VR_STRING_ANSI
+	SENSOR_FIELD_TIME,				//时间VR_STRING_ANSI
+	SENSOR_FIELD_TIME_SPACE,			//时间间隔VR_STRING_ANSI
+	SENSOR_FIELD_CELL_DATA_LEN,			//单个数据长度VR_STRING_ANSI
+	SENSOR_FIELD_IS_SPORT,			//是否运动数据VR_STRING_ANSI
+	SENSOR_FIELD_START_ADDRESS,		//数据起始位置VR_STRING_ANSI
+	SENSOR_FIELD_TOTAL_DATA_LEN,		//数据总长度VR_STRING_ANSI
+	SENSOR_FIELD_VERNO,		//解析版本号VR_STRING_ANSI	
+	SENSOR_FIELD_VALUE,		//值VR_STRING_ANSI	
+	SENSOR_FIELD_MAX					
+	}enumSensorField;
+
+
+	typedef enum{
+	SENSOR_RESERVED,				
+	SENSOR_IDLE_PACKAGE,		//日常数据文件包
+	SENSOR_IDLE_SENSOR_START = SENSOR_IDLE_PACKAGE,
+	SENSOR_GSENSOR,					// GSENSOR数据
+	SENSOR_TEMPRATURE,				//气温数据
+	SENSOR_PRESSURE,				//气压数据
+	SENSOR_HEARTRATE,				//心率数据
+	SENSOR_HUMITY,					//湿度数据
+	SENSOR_IDLE_SENSOR_END,
+	SENSOR_GPS = SENSOR_IDLE_SENSOR_END,						// GPS数据
+	SENSOR_COMPASS,					// 指南针数据
+	SENSOR_GYRO,					//陀螺仪数据
+	SENSOR_DISTANCE,					//里程数据
+	SENSOR_MAX
+	}enumSensor;	
+
+
+typedef enum{
+	DIAL_BLE_RESERVED,
+	DIAL_BLE_ID,			//表盘ID
+	DIAL_BLE_DATA,		//表盘的数据包
+	DIAL_BLE_MAX
+	}enumDialCell;
+
+typedef enum{
+	HEALTH_BLE_RESERVED,
+	HEALTH_BLE_QUERY,					//刷新健康建议VR_VOID
+	HEALTH_BLE_ADIVSE,
+	HEALTH_BLE_ITEM_START=100,
+	HEALTH_BLE_REST_HR= HEALTH_BLE_ITEM_START,	//静息心率VR_STRING_ANSI
+	HEALTH_BLE_VO2MAX,					//最大摄氧量VR_STRING_ANSI
+	HEALTH_BLE_LACTATE_THRESHOLD,		//乳酸阀值VR_STRING_ANSI
+	HEALTH_BLE_STRESS_INDEX,				//压力指数VR_STRING_ANSI
+	HEALTH_BLE_CARDIAC_EFFICIENCY,		//心脏效率VR_STRING_ANSI
+	HEALTH_BLE_SLEEP_QUALITY,				//睡眠质量VR_STRING_ANSI
+	HEALTH_BLE_CARDIAC_RECOVERY_EFFICIENCY,		//心脏恢复效率VR_STRING_ANSI
+	HEALTH_BLE_BODY_FAT,						//体脂VR_STRING_ANSI
+	HEALTH_BLE_BLOOD_SUGAR,						//血糖VR_STRING_ANSI
+	HEALTH_BLE_OXYGEN,						//血氧VR_STRING_ANSI
+	HEALTH_BLE_BLOOD_PRESSURE,						//血压VR_STRING_ANSI
+	HEALTH_BLE_SKIN_CONDUCTANCE,						//皮电VR_STRING_ANSI
+	HEALTH_BLE_TEMPRATURE,						//体温VR_STRING_ANSI
+	HEALTH_BLE_BREATHE_FREQUENCY,				//呼吸频率VR_STRING_ANSI
+	HEALTH_BLE_INDEX_BASE=200,
+	HEALTH_BLE_SPORT_INDEX= HEALTH_BLE_INDEX_BASE,	//运动指数VR_STRING_ANSI
+	HEALTH_BLE_HEALTH_INDEX,					//健康指数VR_STRING_ANSI
+	HEALTH_BLE_MAX
+	}enumHealthCell;
+
+typedef enum{
+	HEALTH_FIELD_RESERVED,		
+	HEALTH_FIELD_DATE,				//日期VR_STRING_ANSI
+	HEALTH_FIELD_TIME,				//时间VR_STRING_ANSI
+	HEALTH_FIELD_CELL_DATA_LEN,			//单个数据长度VR_STRING_ANSI
+	HEALTH_FIELD_START_ADDRESS,		//数据起始位置VR_U32
+	HEALTH_FIELD_TOTAL_DATA_LEN,		//数据总长度VR_STRING_ANSI
+	HEALTH_FIELD_VERNO,		//解析版本号VR_STRING_ANSI
+	HEALTH_FIELD_VALUE,		//健康数据值
+	HEALTH_FIELD_MAX					
+	}enumHealthField;
+
+
+
+typedef enum{
+	TIME_BLE_RESERVED,
+	TIME_BLE_QUERY,				//手表发送的时间查询
+	TIME_BLE_DATE_PART,			//日期
+	TIME_BLE_TIME_PART,			//时间
+	TIME_BLE_MAX
+	}enumTimeCell;
+
+typedef enum{
+	GPS_BLE_RESERVED,
+	GPS_BLE_POS_QUERY,			//GPS查询
+	GPS_BLE_EPHEMERIS_QUERY,	//星历查询
+	GPS_BLE_LONGTITUDE,			//经度
+	GPS_BLE_LATITUDE,			//纬度
+	GPS_BLE_DATE,				//日期
+	GPS_BLE_TIME,				//时间
+	GPS_BLE_ALTITUDE,			//海拔
+	GPS_BLE_DECLINATION,			//磁偏角 
+	GPS_BLE_EPHEMERIS,			//星历
+	GPS_BLE_MAX,
+	}enumGPSCell;
+
+typedef enum{
+	ERROR_REPORT_BLE_RESERVED,
+	ERROR_REPORT_BLE_LOG,					//日志
+	ERROR_REPORT_BLE_MAX,
+	}enumErrorReportCell;
+
+typedef enum{
+	LOCALE_SETTINGS_BLE_RESERVED,
+	LOCALE_SETTINGS_BLE_DATA,		//本地设置
+	LOCALE_SETTINGS_BLE_MAX,
+	}enumLocaleSettingsCell;
+
+typedef enum{
+	MUSIC_BLE_RESERVED,
+	MUSIC_BLE_QUERY,		//查询音乐VR_VOID
+	MUSIC_BLE_VOLUME,		//当前音量VR_STRING_ANSI
+	MUSIC_BLE_VOLUME_MAX,	//最大音量VR_STRING_ANSI
+	MUSIC_BLE_SONG_NAME,		//歌曲名VR_STRING_UTF8
+	MUSIC_BLE_AUTHOR,		//作者VR_STRING_UTF8
+	MUSIC_BLE_ALBUM,		//专辑名VR_STRING_UTF8
+	MUSIC_BLE_PROGRESS,		//当前进度VR_STRING_ANSI(秒)
+	MUSIC_BLE_DURATION,		//总播放时长VR_STRING_ANSI(秒)
+	MUSIC_BLE_STATE,		//总播放时长VR_STRING_ANSI 0=暂停 1=播放
+	MUSIC_BLE_PREV,		//上一首VR_VOID
+	MUSIC_BLE_NEXT,		//下一首VR_VOID
+	MUSIC_BLE_PAUSE,		//暂停VR_VOID
+	MUSIC_BLE_PLAY,		//播放VR_VOID
+	MUSIC_BLE_STOP,		//停止VR_VOID
+	MUSIC_BLE_MAX,
+	}enumMusicCell;
+
+typedef enum{
+	SYN_DONE_BLE_RESERVED,
+	SYN_DONE_BLE_DATE,			
+	SYN_DONE_BLE_TIME,	
+	SYN_DONE_BLE_MAX
+	}enumSynDoneCell;
+
+typedef enum{
+	DATA_COMPARE_UNUSE,
+	DATA_COMPARE_LE,			// <=
+	DATA_COMPARE_EQ,		// ==
+	DATA_COMPARE_GE,			// >=
+	DATA_COMPARE_LT,			// <
+	DATA_COMPARE_GT,			// >
+	DATA_COMPARE_NOT_EQ,	// !=
+	DATA_COMPARE_MAX
+	}enumDataCompare;
+
+typedef enum{
+WISH_TYPE_INT,
+WISH_TYPE_DATE,
+WISH_TYPE_TIME,
+WISH_TYPE_STRING,
+WISH_TYPE_VOID,
+WISH_TYPE_MAX
+}enumWishType;
+
+typedef struct{
+U32 tag;
+U16 vr;
+int iLen;
+char * pBuf;
+}structTagParser;
+
+char * getAnsiStringOfMiniDICOMData(char * pData, int iDataLen);
+int getIntValueOfMiniDICOMData(char * pData, int iDataLen);
+U32 getU32ValueOfMiniDICOMData(char * pData, int iDataLen);
+U16 getU16ValueOfMiniDICOMData(char * pData, int iDataLen);
+short getI16ValueOfMiniDICOMData(char * pData, int iDataLen);
+U8 getU8ValueOfMiniDICOMData(char * pData, int iDataLen);
+char getCharValueOfMiniDICOMData(char * pData, int iDataLen);
+double getDoubleValueOfMiniDICOMData(char * pData, int iDataLen);
+float getFloatValueOfMiniDICOMData(char * pData, int iDataLen);
+char * getGB2312StringOfMiniDICOMData(char * pData, int iDataLen);
+U16 getUTF8StringOfMiniDICOMData(char * pData, int iDataLen, char * pDest, int iDestLen);
+int getDateStringValueOfMiniDICOMData(char * pData, int iDataLen);
+int getTimeStringValueOfMiniDICOMData(char * pData, int iDataLen);
+BOOL getMiniDICOMValueBySmartMode(int vr, char * pData, int iDataLen, char * pDest, int iDestLen, int iWishType);
+
+U16 getGroupOfTag(U32 tag);
+U16 getCellOfTag(U32 tag);
+U8 getFirstByteOfCell(U16 cell);
+U8 getSecondByteOfCell(U16 cell);
+U32 getTagByGroupAndCell(U16 group, U16 cell);
+U16 getCellByBytes(U8 b1, U8 b2);
+int getFirstGroupPos(void);
+int getFirstTagPos(void);
+
+BOOL isGroupFlag(U32 tag);
+BOOL parseTagValid(char * pBuf, structTagParser * pParser);
+BOOL isGroupValid(char * pBuf, int iBufLen);
+BOOL searchTag(U32 tag, char * pBuf, int iLimitLen, structTagParser * pParser, int *pDataPos);
+
+
+#if defined(__cplusplus)
+}
+#endif 
+
+#endif //MINI_DICOM_H
+
+
+
